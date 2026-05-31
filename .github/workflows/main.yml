@@ -1,0 +1,32 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    name: Build AppDataLens.exe
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build portable executable
+        shell: cmd
+        run: build_windows.bat
+
+      - name: Package executable
+        shell: pwsh
+        run: |
+          Compress-Archive -Path release\AppDataLens.exe -DestinationPath AppDataLens-windows-exe.zip -Force
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppDataLens-windows-exe
+          path: AppDataLens-windows-exe.zip
